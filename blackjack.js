@@ -53,6 +53,25 @@ var deck = [
   { point: 1, suit: 'spades' },
 ];
 
+
+function shuffle(array) {
+  for (var i = array.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var temp = array[i];
+      array[i] = array[j];
+      array[j] = temp;
+  }
+  return array;
+}
+function deal(){
+  dealerHand.push(deck.pop())
+  dealerHand.push(deck.pop())
+  playerHand.push(deck.pop())
+  playerHand.push(deck.pop())
+  console.log(deck)
+
+}
+
 function getCardImageURL(x){
   if (deck[x]['point']==13){
     var card = 'king' + "_of_" + deck[x]['suit'] + ".png"
@@ -65,44 +84,54 @@ function getCardImageURL(x){
   }else{
   var card = deck[x]['point'] + "_of_" + deck[x]['suit'] + ".png"
   };
-  deck.splice(x,1);
   return card;
 };
 
 function calculatePoints(n){
   total = 0
   for(let i=0; i<n.length; i++){
-    total = total + n[i]
+    if (n[i]['point'] === 13 || n[i]['point'] === 12 || n[i]['point'] === 11){
+      total = total + 10;
+    }else{
+      total = total + n[i]['point'];
+    }
   }
-  return total;
+  return total
+}
+
+function checkBust(hand){
+  if(calculatePoints(hand) > 21){
+    return true;
+  }
 };
 
-function shuffleArray(array) {
-  for (var i = array.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var temp = array[i];
-      array[i] = array[j];
-      array[j] = temp;
-  }
-  return array;
-}
+$(document).ready(function () {
+
 var dealerHand = []
 var playerHand = []
+deal();
 
-$(document).ready(function () {
- console.log('printed')
  $('#deal-button').click(function(event){
-   card = 1
-   dealerHand.push(deck[card])
-   let x = getCardImageURL(card);
-    $('#dealer-hand').append('<img src="/images/'+ x + '" />');
-    var points = calculatePoints(dealerHand)
-    $('#dealer-points').text(points)
+   //deal 2 cards to player and dealer
 
+   $('#dealer-points').text(calculatePoints(dealerHand))
+   $('#dealer-hand').append('<img src="/images/'+ getCardImageURL(card) + '" />');
+
+   if (checkBust(dealerHand) == true){
+      $('#messages').text('Dealer Lost!')
+    }else if (checkBust(playerHand) == true){
+      $('#messages').text('Player Lost!')
+    }
  })
+
  $('#hit-button').click(function(event){
+   //deal card to player
    var card = $('<img src="/images/7_of_clubs.png" alt="">')
    $('#dealer-hand').append(card)
+ });
+
+ $('stand-button').click(function(event){
+  //  deal to the dealer until over 17 points
  })
 });
 
